@@ -3,7 +3,7 @@
   import { useState, useEffect, useCallback, Suspense } from "react";
   import { useSearchParams, useRouter } from "next/navigation";
 
-  const DISCORD_INVITE = "https://discord.gg/B29pp4vm5G";
+  const DISCORD_INVITE = "https://discord.gg/aERxwdSGxz";
   const WORKINK_LINK  = "https://work.ink/2tqZ/keyserver";
 
   const DiscordIcon = () => (
@@ -19,6 +19,8 @@
     const [discordVerified, setDiscordVerified] = useState(false);
     const [checkingVerify, setCheckingVerify] = useState(true);
     const [error, setError] = useState("");
+    const [isEs, setIsEs] = useState(true);
+    useEffect(() => { setIsEs(!navigator.language.toLowerCase().startsWith("en")); }, []);
 
     const checkDiscordCookie = useCallback(async () => {
       try {
@@ -36,8 +38,8 @@
       const verified = searchParams.get("verified");
       const err = searchParams.get("error");
 
-      if (err === "token_invalid") setError("❌ El link expiró o ya fue usado. Corre /verificar de nuevo en Discord.");
-      if (err === "token_missing") setError("❌ Link inválido. Usa /verificar en el servidor de Discord.");
+      if (err === "token_invalid") setError(isEs ? "❌ El link expiró o ya fue usado. Usa !verify de nuevo en Discord." : "❌ The link expired or was already used. Run !verify again in Discord.");
+      if (err === "token_missing") setError(isEs ? "❌ Link inválido. Usa !verify en el servidor de Discord." : "❌ Invalid link. Use !verify in the Discord server.");
 
       if (verified === "1") {
         // Viene de redireccion post-verificacion, limpiar URL
@@ -69,8 +71,8 @@
                 1
               </div>
               <div>
-                <p className="text-white font-medium text-sm">Únete al servidor de Discord</p>
-                <p className="text-gray-500 text-xs">Necesitas estar en el servidor para continuar</p>
+                <p className="text-white font-medium text-sm">{isEs ? "Únete al servidor de Discord" : "Join the Discord server"}</p>
+                <p className="text-gray-500 text-xs">{isEs ? "Necesitas estar en el servidor para continuar" : "You need to be in the server to continue"}</p>
               </div>
             </div>
             <a
@@ -80,7 +82,7 @@
               className="flex items-center justify-center gap-2 bg-[#5865F2] hover:bg-[#4752c4] text-white px-4 py-2.5 rounded-lg font-medium transition-colors text-sm w-full"
             >
               <DiscordIcon />
-              Unirse al Discord
+              {isEs ? "Unirse al Discord" : "Join Discord"}
             </a>
           </div>
 
@@ -97,7 +99,7 @@
                 <p className="text-gray-500 text-xs">
                   {discordVerified
                     ? "El bot confirmó tu membresía"
-                    : "Escribe /verificar en cualquier canal del servidor"}
+                    : isEs ? "Escribe !verify en cualquier canal del servidor" : "Type !verify in any channel of the server"}
                 </p>
               </div>
             </div>
@@ -107,9 +109,9 @@
                   <p className="text-gray-400 text-xs">Verificando...</p>
                 ) : (
                   <p className="text-gray-400 text-xs leading-relaxed">
-                    En el servidor de Discord, escribe el comando{" "}
-                    <code className="bg-gray-700 text-indigo-300 px-1 py-0.5 rounded text-xs">/verificar</code>{" "}
-                    y haz clic en el link que te manda el bot.
+                    {isEs ? "En el servidor de Discord, escribe" : "In the Discord server, type"}{" "}
+                    <code className="bg-gray-700 text-indigo-300 px-1 py-0.5 rounded text-xs">!verify</code>{" "}
+                    {isEs ? "y haz clic en el link que te manda el bot." : "and click the link the bot sends you."}
                   </p>
                 )}
               </div>
